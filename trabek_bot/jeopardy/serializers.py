@@ -4,6 +4,7 @@ from jeopardy.models import (
     Question,
 )
 
+
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
@@ -15,6 +16,7 @@ class PlayerSerializer(serializers.ModelSerializer):
             'wrong_questions',
             'right_questions',
         )
+
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
