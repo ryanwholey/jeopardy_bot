@@ -72,6 +72,12 @@ module.exports = (function() {
             if (!Array.isArray(answerArray)) {
                 answerArray = answerArray.split(' ');
             }
+            // for now, we are stripping out the aka answers ( other answer )
+            // eventually we wanto split these into two possible answers
+            // so players have a better chance of getting the question correct
+            answerArray = answerArray.join(' ');
+            answerArray = answerArray.replace(/\([^)]*\)/, '');
+            answerArray = answerArray.split(' ');
 
             var answer = answerArray
                 .map(function(word) {

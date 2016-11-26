@@ -87,5 +87,13 @@ describe('Utils', function() {
 
             expect(isCorrect).toEqual(true);
         });
+
+        it('should return true "(John) Newman"', function() {
+            var questionAnswer = "(John) Newman".split(' ');
+            var userAnswer = "what is the newman award".split(' ');
+            var isCorrect = utils.validateAnswer.apply(this, [userAnswer, questionAnswer].map(utils.cleanAnswer));
+
+            expect(isCorrect).toEqual(true);
+        });
     });
 });
