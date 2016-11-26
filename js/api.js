@@ -9,9 +9,13 @@ module.exports = (function() {
     var port = process.env.JEOPARDY_PORT || 8000;
     var base_url = host + ':' + port + '/api/';
 
+    if (!user || !pass) {
+        throw new Error('Please set your username and password or the api wont work');
+    }
+
     return {
 
-        getRandomQuestion: function(jeopardy_username) {
+        getRandomQuestion: function(userName) {
             var url = base_url + 'questions/random/';
             var errorMessage = 'API Error: fetch question error';
 
@@ -19,7 +23,7 @@ module.exports = (function() {
                 method: 'POST',
                 uri: url,
                 body: {
-                    player: jeopardy_username
+                    player: userName
                 },
                 json: true
             };
@@ -41,7 +45,7 @@ module.exports = (function() {
 
         },
 
-        getScores() {
+        getScores: function() {
             var url = base_url + 'players/';
             var errorMessage = 'API Error: Error fetching scores';
 
@@ -52,6 +56,23 @@ module.exports = (function() {
                 })
                 .catch(utils.handleError.bind(this, errorMessage));
 
+        },
+
+        patchAnsweredQuestion: function(userName, questionId, isCorrect) {
+            var answerType = isCorrect ? 'correct' : 'incorrect',
+                url = base_url + 'players/name/' + userName + '/?' + answerType + '=' + questionId,
+                errorMessage = 'Error patching correct question to ' + userName + ' with qid ' + questionId;
+
+            var options = {
+                method: 'PATCH',
+                uri: url
+            };
+
+            return $(options)
+                .then(function(response) {
+                    return JSON.parse(response);
+                })
+                .catch(utils.handleError.bind(this, errorMessage));
         }
     };
 

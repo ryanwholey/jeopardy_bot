@@ -99,7 +99,12 @@ class PlayerByName(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
     serializer_class = PlayerSerializer
     lookup_field = 'name'
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('asked', 'score')
+    filter_fields = (
+        'asked',
+        'score',
+        'correct',
+        'incorrect',
+    )
 
     def get(self, request, *args, **kwargs):
         player = Player.objects.get(name=kwargs['name'])
@@ -112,11 +117,14 @@ class PlayerByName(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, *args, **kwargs):
-        player = Player.objects.get(name=kwargs['name'])
-        query_asked = request.query_params.get('asked', None)
-        query_score = request.query_params.get('score', None)
+        player = Player.objects.get_or_create(name=kwargs['name'])[0]
+        query_asked = request.query_params.get('asked')
+        query_score = request.query_params.get('score')
+        correct_question_id = request.query_params.get('correct')
+        incorrect_question_id = request.query_params.get('incorrect')
         asked = player.asked
         score = player.score
+
         if query_asked:
             player.asked = asked + 1
         if query_score:
@@ -125,10 +133,20 @@ class PlayerByName(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
             except:
                 Response(status=status.HTTP_400_BAD_REQUEST)
             player.score = score + query_score
-        if query_score or query_asked:
+        if correct_question_id:
+            question = Question.objects.get(id=correct_question_id)
+            player.right_questions.add(question)
+            player.score = score + int(question.value)
+        if incorrect_question_id:
+            question = Question.objects.get(id=incorrect_question_id)
+            player.wrong_questions.add(question)
+            player.score = score - int(question.value)
+
+        if query_score or query_asked or correct_question_id or incorrect_question_id:
             player.save()
         serializer = PlayerSerializer(player)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class PlayerById(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericAPIView):
     """
@@ -140,7 +158,12 @@ class PlayerById(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Generi
     serializer_class = PlayerSerializer
     lookup_fields = 'pk'
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('asked', 'score')
+    filter_fields = (
+        'asked',
+        'score',
+        'correct',
+        'incorrect',
+    )
 
     def get(self, request, *args, **kwargs):
         player = Player.objects.get(id=kwargs['pk'])
@@ -154,8 +177,10 @@ class PlayerById(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Generi
 
     def patch(self, request, *args, **kwargs):
         player = Player.objects.get(id=kwargs['pk'])
-        query_asked = request.query_params.get('asked', None)
-        query_score = request.query_params.get('score', None)
+        query_asked = request.query_params.get('asked')
+        query_score = request.query_params.get('score')
+        correct_question_id = request.query_params.get('correct')
+        incorrect_question_id = request.query_params.get('incorrect')
         asked = player.asked
         score = player.score
         if query_asked:
@@ -166,7 +191,15 @@ class PlayerById(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Generi
             except:
                 Response(status=status.HTTP_400_BAD_REQUEST)
             player.score = score + query_score
-        if query_score or query_asked:
+        if correct_question_id:
+            question = Question.objects.get(correct_question_id)
+            player.right_questions.add(question)
+            player.score -= int(question.value)
+        if incorrect_question_id:
+            question = Question.objects.get(incorrect_question_id)
+            player.wrong_questions.add(question)
+            player.score -= int(question.value)
+        if query_score or query_asked or correct_question_id or incorrect_question_id:
             player.save()
         serializer = PlayerSerializer(player)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

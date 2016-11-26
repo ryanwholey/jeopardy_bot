@@ -6,18 +6,19 @@ module.exports = (function() {
     return {
 
         fireGetQuestion: function (options, params, callback) {
-            var channel = options.channel,
+            var channel = options.channelName,
+                userName = options.userName,
                 errorMessage = 'Error fetching question';
 
-            api.getRandomQuestion(options.user)
-                .then(utils.formatQuestion)
+            api.getRandomQuestion(userName)
                 .then(utils.setQuestionAsked.bind(this, callback))
+                .then(utils.formatQuestion)
                 .then(utils.sendMessage.bind(this, channel, params))
                 .catch(utils.handleError.bind(this, errorMessage));
         },
 
         fireGetScores(options, params) {
-            var channel = options.channel,
+            var channel = options.channelName,
                 errorMessage = 'Error fetching scores';
 
             api.getScores()
@@ -27,8 +28,8 @@ module.exports = (function() {
         },
 
         fireMidQuestion(options, params) {
-            var channel = options.channel,
-                midQuestionMessage = 'Another question is currently on the table';
+            var channel = options.channelName,
+                midQuestionMessage = 'Another question is currently on the table',
                 errorMessage = 'Error sending mid question response';
 
             try {
@@ -38,20 +39,35 @@ module.exports = (function() {
             }
         },
 
-        fireUnsetQuestion(options, params) {
+        fireUnsetQuestion() {
             this.state.question = null;
             clearTimeout(this.timeout);
             console.log('question cleared');
         },
 
-        fireAnswer() {
+        fireAnswer(options, params) {
+            var question = this.state.question;
 
+            if (!question) {
+                utils.handleError('No question error: question is false', new Error());
+                return;
+            }
+
+            var questionAnswer = question.answer.split(' ');
+            var userAnswer = utils.extractAnswer(options.msgArray);
+            var isCorrect = utils.validateAnswer.apply(this, [userAnswer, questionAnswer].map(utils.cleanAnswer));
+
+            options.handleAnswerWithType(options, params, isCorrect);
+
+            if (isCorrect) {
+                options.handleUnsetQuestion();
+            }
         },
 
         fireAnswerNoQuestion(options, params) {
-            var channel = options.channel,
+            var channel = options.channelName,
                 question = this.state.question,
-                noQuestionMessage = 'Sorry, the question has expired, ask another with `!trabek question`';
+                noQuestionMessage = 'Sorry, the question has expired, ask another with `!trabek question`',
                 helpMenuMessage = 'See a list of commands with `!trabek help`';
 
             if (question) {
@@ -63,7 +79,7 @@ module.exports = (function() {
         },
 
         fireMenu(options, params) {
-            var channel = options.channel,
+            var channel = options.channelName,
                 commands = options.menu;
 
             var msg = [];
@@ -83,5 +99,23 @@ module.exports = (function() {
             utils.sendMessage.call(this, channel, params, message);
         },
 
+        fireAnswerWithType(options, params, isCorrect) {
+            var channel = options.channelName,
+                userName = options.userName,
+                question = this.state.question,
+                errorMessage = 'fireCorrect: no question found';
+
+            if (!question) {
+                utils.handleError(errorMessage, new Error());
+            }
+
+            options.correct = isCorrect;
+
+            api.patchAnsweredQuestion(userName, question.id, isCorrect)
+                .then(utils.formatAnswerResponse.bind(this, options))
+                .then(utils.sendMessage.bind(this, channel, params))
+                .catch(utils.handleError.bind(this, errorMessage));
+
+        }
     };
 })();

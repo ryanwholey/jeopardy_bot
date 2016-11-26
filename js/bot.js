@@ -15,7 +15,7 @@ var bot = new Bot({
 bot.config = {
     icon_emoji: ':man:',
     greeting: '...and now here\'s the host of Jeopardy!, Trabek Bot!',
-    questionTime: 10 // time in seconds
+    questionTime: 60 // time in seconds
 };
 
 bot.state = {
@@ -35,13 +35,11 @@ var commandDescriptions = {
     'question': 'Ask Trebek for a question',
     'scores': 'List the scores of all players',
     'buzz': 'Answer one of Trebek\'s questions',
-    'help': 'List the commands and rules'
+    'help': 'List the commands and rules',
 };
 
 var actionMap = {
-    // 'correct': actions.fireCorrect.bind(bot),
-    // 'wrong': actions.fireIncorrect.bind(bot),
-    // 'asked': actions.fireAsked.bind(bot),
+    'ANSWER_WITH_TYPE': actions.fireAnswerWithType.bind(bot),
     'MENU': actions.fireMenu.bind(bot),
     'ANSWER_NO_QUESTION': actions.fireAnswerNoQuestion.bind(bot),
     'ANSWER': actions.fireAnswer.bind(bot),
@@ -70,7 +68,9 @@ function _handleScores(options, params) {
 
 function _handleAnswer(options, params) {
     if (bot.state.question) {
-        // actionMap['ANSWER']
+        options.handleAnswerWithType = actionMap['ANSWER_WITH_TYPE'];
+        options.handleUnsetQuestion = actionMap['UNSET_QUESTION'];
+        actionMap['ANSWER'](options, params);
     } else {
         actionMap['ANSWER_NO_QUESTION'](options, params);
     }
@@ -125,8 +125,9 @@ bot.on('message', function(msg) {
             var userName = bot.membersById[msg.user];
 
             var options = {
-                user: userName,
-                channel: channelName
+                userName: userName,
+                channelName: channelName,
+                msgArray: msgArray
             };
 
             var params = {
@@ -141,10 +142,3 @@ bot.on('message', function(msg) {
         }
     }
 });
-
-
-
-
-
-
-
