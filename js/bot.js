@@ -15,7 +15,13 @@ var bot = new Bot({
 bot.config = {
     icon_emoji: ':man:',
     greeting: '...and now here\'s the host of Jeopardy!, Trabek Bot!',
-    questionTime: 60 // time in seconds
+    questionTime: 80, // time in seconds
+    timesUpMessages: [
+        'Oop time\'s up, the correct answer is ',
+        'Aaand the answer we were looking for is ',
+        'NOPE! The correct answer is ',
+        'I\'m sorry, the answer we were looking for is '
+    ]
 };
 
 bot.state = {

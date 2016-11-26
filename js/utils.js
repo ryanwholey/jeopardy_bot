@@ -54,10 +54,10 @@ module.exports = (function() {
             console.log(message, err);
         },
 
-        setQuestionAsked: function(callback, question) {
+        setQuestionAsked: function(callback, options, params, question) {
             this.state.question = question;
 
-            this.timeout = setTimeout(callback, this.config.questionTime * 1000);
+            this.timeout = setTimeout(callback.bind(this, options, params), this.config.questionTime * 1000);
 
             return question;
         },
@@ -110,6 +110,10 @@ module.exports = (function() {
             msg.push(player.name + ': $' + player.score);
 
             return msg.join('\n');
+        },
+
+        formatAnswerText: function(text) {
+            return unescape(text);
         }
     };
 

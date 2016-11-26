@@ -11,7 +11,7 @@ module.exports = (function() {
                 errorMessage = 'Error fetching question';
 
             api.getRandomQuestion(userName)
-                .then(utils.setQuestionAsked.bind(this, callback))
+                .then(utils.setQuestionAsked.bind(this, callback, options, params))
                 .then(utils.formatQuestion)
                 .then(utils.sendMessage.bind(this, channel, params))
                 .catch(utils.handleError.bind(this, errorMessage));
@@ -39,10 +39,14 @@ module.exports = (function() {
             }
         },
 
-        fireUnsetQuestion() {
+        fireUnsetQuestion(options, params) {
+            var channel = options.channelName;
+            var customMessage = this.config.timesUpMessages[Math.random() * 4 | 0];
+            var answer = utils.formatAnswerText(this.state.question.answer);
+            var expiredMessage = ':alarm_clock:  ' + customMessage + '`'+ answer +'`'+ ' :alarm_clock:';
+            utils.sendMessage.call(this, channel, params, expiredMessage);
             this.state.question = null;
             clearTimeout(this.timeout);
-            console.log('question cleared');
         },
 
         fireAnswer(options, params) {
