@@ -39,6 +39,7 @@ module.exports = (function() {
                         link = link.substr(0, link.indexOf('\"'));
                         question.question += ' ' + link;
                     }
+                    console.log(question)
                     return question;
                 })
                 .catch(utils.handleError.bind(this, errorMessage));

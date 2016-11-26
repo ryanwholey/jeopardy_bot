@@ -40,11 +40,15 @@ module.exports = (function() {
         },
 
         fireUnsetQuestion(options, params) {
-            var channel = options.channelName;
-            var customMessage = this.config.timesUpMessages[Math.random() * 4 | 0];
-            var answer = utils.formatAnswerText(this.state.question.answer);
-            var expiredMessage = ':alarm_clock:  ' + customMessage + '`'+ answer +'`'+ ' :alarm_clock:';
-            utils.sendMessage.call(this, channel, params, expiredMessage);
+
+            if (!options.correct) {
+                var channel = options.channelName;
+                var customMessage = this.config.timesUpMessages[Math.random() * 4 | 0];
+                var answer = utils.formatAnswerText(this.state.question.answer);
+                var expiredMessage = ':alarm_clock:  ' + customMessage + '`'+ answer +'`'+ ' :alarm_clock:';
+                utils.sendMessage.call(this, channel, params, expiredMessage);
+            }
+
             this.state.question = null;
             clearTimeout(this.timeout);
         },
@@ -64,7 +68,7 @@ module.exports = (function() {
             options.handleAnswerWithType(options, params, isCorrect);
 
             if (isCorrect) {
-                options.handleUnsetQuestion();
+                options.handleUnsetQuestion(options, params);
             }
         },
 
