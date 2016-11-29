@@ -1,0 +1,23 @@
+{
+  "name": "trabek_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine",
+    "start": "nodemon js/bot"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "btoa": "^1.1.2",
+    "jquery": "^3.1.1",
+    "request": "^2.79.0",
+    "request-promise": "^4.1.1",
+    "slackbots": "^0.5.3"
+  },
+  "devDependencies": {
+    "jasmine": "^2.5.2"
+  }
+}

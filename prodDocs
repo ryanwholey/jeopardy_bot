@@ -1,0 +1,25 @@
+sudo apt-get install python-pip
+sudo pip install virtualenv
+sudo apt-get install mysql-server
+move django_config.cnf to .secret
+create mysql user 
+sudo apt-get install libmysqlclient-dev
+pip install -r requirements.txt
+create database jeopardy_db
+run .secrets mysql script to add privs
+had to just add perms to settings.py
+create swapfile
+https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
+enable swap
+update path to map to the proper question.json file path
+run load json into db
+
+
+SUPERVISOR:
+$ pip install gunicorn
+$ pip install supervisor
+$ supervisord OR ./prod
+ps aux | grep supvervisor to see if it worked
+kill -9 `/tmp/supervisord.pid` to kill
+kill -9 `/tmp/gunicorn.pid` to kill
+change port to.... 4000?
