@@ -17,7 +17,8 @@ module.exports = (function() {
 
     var wordsToOverlook = {
         a: 'a',
-        the: 'the'
+        the: 'the',
+        an: 'an'
     };
 
     return {
