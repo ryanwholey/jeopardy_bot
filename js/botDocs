@@ -1,0 +1,7 @@
+There are a few env vars that should be set
+SLACK_TOKEN - the token for the slack channel
+JEOPARDY_USERNAME - the django username
+JEOPARDY_PASSWORD - the django password
+
+to run bot locally run node bot.js
+to run bot in prod run pm2 start bot.js
