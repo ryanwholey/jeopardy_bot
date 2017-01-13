@@ -96,4 +96,15 @@ describe('Utils', function() {
             expect(isCorrect).toEqual(true);
         });
     });
+
+    describe('clean', function() {
+        it('should return correct for "Haight-Ashbury"', function() {
+            var questionAnswer= "Haight-Ashbury";
+            var expected = ['haight', 'ashbury'];
+            var actual = utils.cleanAnswer(questionAnswer);
+
+            expect(actual).toEqual(expected);
+        });
+    });
 });
+

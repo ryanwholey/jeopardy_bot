@@ -78,6 +78,7 @@ module.exports = (function() {
             // so players have a better chance of getting the question correct
             answerArray = answerArray.join(' ');
             answerArray = answerArray.replace(/\([^)]*\)/, '');
+            answerArray = answerArray.replace(/-/,' ');
             answerArray = answerArray.split(' ');
 
             var answer = answerArray
