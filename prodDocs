@@ -5,7 +5,7 @@ move django_config.cnf to .secret
 create mysql user 
 sudo apt-get install libmysqlclient-dev
 pip install -r requirements.txt
-create database jeopardy_db
+CREATE DATABASE jeopardy_db CHARACTER SET utf8;
 run .secrets mysql script to add privs
 had to just add perms to settings.py
 create swapfile
